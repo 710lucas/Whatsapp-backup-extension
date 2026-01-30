@@ -1,5 +1,6 @@
 document.getElementById('btnRun').addEventListener('click', async () => {
   const max = parseInt(document.getElementById('maxConversas').value) || 5;
+  const scrollTimes = parseInt(document.getElementById('scrollCount').value) || 5;
   const statusDiv = document.getElementById('status');
   const resultArea = document.getElementById('resultArea');
   const btnRun = document.getElementById('btnRun');
@@ -19,7 +20,7 @@ document.getElementById('btnRun').addEventListener('click', async () => {
   }
 
   // Enviar mensagem para o content script
-  chrome.tabs.sendMessage(tab.id, { action: "runBackup", max: max }, (response) => {
+  chrome.tabs.sendMessage(tab.id, { action: "runBackup", max: max, scrollTimes: scrollTimes }, (response) => {
     btnRun.disabled = false;
     
     if (chrome.runtime.lastError) {
@@ -32,8 +33,16 @@ document.getElementById('btnRun').addEventListener('click', async () => {
       statusDiv.classList.add('hidden');
       resultArea.classList.remove('hidden');
       
+      const timeDiv = document.getElementById('executionTime');
+      if (response.duration) {
+        timeDiv.textContent = `Backup finalizado em ${response.duration.toFixed(2)} segundos.`;
+      }
+
       const jsonString = JSON.stringify(response.data, null, 2);
       document.getElementById('jsonOutput').value = jsonString;
+    } else if (response && response.status === "error") {
+      statusDiv.innerHTML = `<span style="color:red; font-weight:bold;">${response.message}</span>`;
+      statusDiv.classList.remove('hidden');
     } else {
       statusDiv.textContent = "Ocorreu um erro desconhecido ou a extração falhou.";
     }

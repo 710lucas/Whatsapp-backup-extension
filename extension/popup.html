@@ -12,9 +12,17 @@
     <p>Insira o número máximo de conversas para processar:</p>
     
     <div class="input-group">
-      <input type="number" id="maxConversas" value="5" min="1">
+      <input type="number" id="maxConversas" value="5" min="1" placeholder="Max de conversas">
       <button id="btnRun">Iniciar Backup</button>
     </div>
+
+    <details style="margin-top: 10px;">
+        <summary style="cursor: pointer; color: #555;">Configurações Avançadas</summary>
+        <div style="margin-top: 5px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;">
+            <label for="scrollCount" style="display: block; font-size: 13px; margin-bottom: 5px;">Quantidade de Scrolls/Conversa:</label>
+            <input type="number" id="scrollCount" value="5" min="1" max="100" style="width: 100%; box-sizing: border-box;">
+        </div>
+    </details>
 
     <!-- Novo Botão -->
     <button id="btnViewer" class="secondary-btn">Abrir Visualizador de Backup</button>
@@ -22,6 +30,7 @@
     <div id="status" class="hidden">Processando...</div>
 
     <div id="resultArea" class="hidden">
+      <div id="executionTime" style="margin-bottom: 10px; font-weight: bold; color: green;"></div>
       <div class="actions">
         <span>Resultado (JSON):</span>
         <button id="btnCopy">Copiar JSON</button>

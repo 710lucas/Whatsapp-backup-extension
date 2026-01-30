@@ -22,6 +22,11 @@ const btnCancelPaste = document.getElementById('btnCancelPaste');
 const btnConfirmPaste = document.getElementById('btnConfirmPaste');
 const pasteArea = document.getElementById('pasteArea');
 
+// Elementos da Modal de Imagem
+const imageModal = document.getElementById('imageModal');
+const fullImage = document.getElementById('fullImage');
+const closeImage = document.querySelector('.close-image');
+
 // Event Listeners
 btnUpload.addEventListener('click', () => fileInput.click());
 btnPaste.addEventListener('click', () => {
@@ -63,6 +68,22 @@ pasteModal.addEventListener('click', (e) => {
         pasteModal.classList.add('hidden');
     }
 });
+
+// Listener Modal Imagem
+closeImage.onclick = function() {
+    imageModal.classList.add('hidden');
+}
+imageModal.onclick = function(e) {
+    if (e.target === imageModal) {
+        imageModal.classList.add('hidden');
+    }
+}
+
+// Função Global (para ser chamada no HTML)
+window.openImageViewer = function(src) {
+    imageModal.classList.remove('hidden');
+    fullImage.src = src;
+}
 
 linkImport.addEventListener('click', (e) => {
     e.preventDefault();
@@ -114,35 +135,39 @@ function detectOwner(data) {
         });
         
         authorsInChat.forEach(author => {
-            // O nome do chat NÃO conta como autor comum (pois é local àquele chat)
-            // A menos que seja um chat de grupo, ai complica.
-            // Mas "Eu" estou em todos.
-            
-            // Só conta se o autor NÃO for igual ao nome do chat
-            // (Isso elimina o interlocutor de 1-on-1 chats de ser o 'dono')
-            if (author !== chat.nome) {
+            // Verifica se o autor não é o nome do chat (inclusive match parcial)
+            if (!isSamePerson(author, chat.nome)) {
                 authorCounts[author] = (authorCounts[author] || 0) + 1;
             }
         });
     });
     
-    // Sortear para pegar o mais frequente
+    // Filtrar candidatos
     let max = 0;
-    let candidate = null;
+    let candidates = [];
+    
     for (const [author, count] of Object.entries(authorCounts)) {
         if (count > max) {
             max = count;
-            candidate = author;
+            candidates = [author];
+        } else if (count === max) {
+            candidates.push(author);
         }
     }
     
-    // Se temos mais de 1 chat, a heurística é forte.
-    if (data.length > 1) return candidate;
+    // Se houver empate (ex: 1 chat com 2 pessoas e nomes diferentes do titulo)
+    // Retorna null para usar fallback por chat
+    if (candidates.length > 1) return null;
     
-    // Se temos apenas 1 chat e não achamos ninguém (ex: grupo onde nome do chat != autores), 
-    // ou candidato foi encontrado (1-on-1 onde eu sou o outro).
-    // Se candidate for null (ex: autores = [ChatName]), não tem o que fazer.
-    return candidate;
+    return candidates[0] || null;
+}
+
+function isSamePerson(name1, name2) {
+    if (!name1 || !name2) return false;
+    const n1 = name1.toLowerCase().trim();
+    const n2 = name2.toLowerCase().trim();
+    // Verifica igualdade ou se um contém o outro (ex: "Jessica" e "Jessica S2")
+    return n1 === n2 || n1.includes(n2) || n2.includes(n1);
 }
 
 function renderContacts(data) {
@@ -167,6 +192,11 @@ function renderContacts(data) {
             // Tenta extrair texto limpo
             const parsed = parseMessage(rawLast);
             lastMsg = parsed.text;
+            
+            if (!lastMsg && parsed.images.length > 0) {
+               lastMsg = "📷 Imagem";
+            }
+            
             lastDate = parsed.date + ' ' + parsed.time;
         }
 
@@ -236,29 +266,72 @@ function loadChat(index) {
             if (detectedOwner && parsed.author === detectedOwner) {
                 // Se detectamos o dono e bate, é nosso
                 type = 'outgoing';
-            } else if (!detectedOwner && parsed.author !== chat.nome) {
-                // Fallback para caso simples (1-on-1 sem detecção global):
-                // Se não é o nome do chat, assume que é nosso (comportamento antigo)
-                type = 'outgoing';
+            } else if (!detectedOwner) {
+                // Fallback sem dono detectado
+                // Se o autor PARECE com o nome do chat, é Incoming. Senão é Outgoing.
+                if (isSamePerson(parsed.author, chat.nome)) {
+                     type = 'incoming';
+                } else {
+                     type = 'outgoing';
+                }
             }
         }
         
         msgDiv.className = `message ${type}`;
         
-        // Cor do nome
-        let colorStyle = '';
-        if (type === 'incoming') {
-            const color = getColorForName(parsed.author);
-            colorStyle = `style="color: ${color}"`;
+        // --- Renderização Segura (sem innerHTML para eventos) ---
+        
+        // Container Meta
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'msg-meta';
+        
+        // Header (Nome do autor em Incoming)
+        if (parsed.author && type === 'incoming') {
+            const header = document.createElement('span');
+            header.className = 'msg-header';
+            header.textContent = parsed.author;
+            header.style.color = getColorForName(parsed.author);
+            contentDiv.appendChild(header);
         }
 
-        msgDiv.innerHTML = `
-            <div class="msg-meta">
-                ${parsed.author && type === 'incoming' ? `<span class="msg-header" ${colorStyle}>${parsed.author}</span>` : ''}
-                <span class="msg-text">${escapeHtml(parsed.text)}</span>
-            </div>
-            <span class="msg-time">${parsed.time}</span>
-        `;
+        // Imagens
+        if (parsed.images && parsed.images.length > 0) {
+            const imgsDiv = document.createElement('div');
+            imgsDiv.className = 'msg-images';
+            parsed.images.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = "Imagem";
+                img.style.cursor = 'pointer'; // Visual feedback
+                // Listener direto no elemento (sem usar string onclick)
+                img.addEventListener('click', () => {
+                    if (imageModal && fullImage) {
+                        imageModal.classList.remove('hidden');
+                        fullImage.src = src;
+                    } else {
+                        console.error('Elementos da modal não encontrados');
+                    }
+                });
+                imgsDiv.appendChild(img);
+            });
+            contentDiv.appendChild(imgsDiv);
+        }
+
+        // Texto
+        if (parsed.text) {
+             const txt = document.createElement('span');
+             txt.className = 'msg-text';
+             txt.textContent = parsed.text; 
+             contentDiv.appendChild(txt);
+        }
+        
+        msgDiv.appendChild(contentDiv);
+        
+        // Hora
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'msg-time';
+        timeSpan.textContent = parsed.time;
+        msgDiv.appendChild(timeSpan);
         
         messagesContainer.appendChild(msgDiv);
     });
@@ -300,30 +373,44 @@ function getInitials(name) {
  * Formato comum: "[14:30, 25/09/2023] Lucas: Olá tudo bem?" 
  * Ou data-pre-plain-text attribute do scraping original
  */
-function parseMessage(rawText) {
+function parseMessage(raw) {
     // Regex para capturar data/hora entre colchetes seguido de resto
     // Ex: [10:30, 12/01/2023] Nome: Mensagem...
-    // O seu script original concatena: el.getAttribute('data-pre-plain-text') + " " + el.innerText
+    // raw vem como objeto agora { meta: "...", conteudo: { texto: "...", imagens: [...] } }
     
-    const regex = /^\[(.*?),\s(.*?)\]\s(.*?):\s(.*)/;
-    const match = rawText.match(regex);
+    // Suporte retrocompatível se raw for string (caso usem JSON antigo)
+    if (typeof raw === 'string') {
+        const regexLegacy = /^\[(.*?),\s(.*?)\]\s(.*?):\s(.*)/;
+        const matchLegacy = raw.match(regexLegacy);
+        if (matchLegacy) {
+            return {
+                time: matchLegacy[1], date: matchLegacy[2], author: matchLegacy[3], 
+                text: matchLegacy[4], images: []
+            };
+        }
+        return { time: '', date: '', author: '', text: raw, images: [] };
+    }
+
+    const regex = /^\[(.*?),\s(.*?)\]\s(.*?):/; // Paramos de pegar o texto na regex pois ele está em conteudo
+    const match = raw.meta ? raw.meta.match(regex) : null;
 
     if (match) {
         return {
             time: match[1],   // 10:30
             date: match[2],   // 12/01/2023
             author: match[3], // Nome
-            text: match[4]    // Mensagem (pode perder o "Nome: " se a regex pegar)
+            text: raw.conteudo && raw.conteudo.texto ? raw.conteudo.texto : '',
+            images: raw.conteudo && raw.conteudo.imagens ? raw.conteudo.imagens : []
         };
     }
     
     // Fallback se não der match (ex: mensagem contínua sem cabeçalho)
-    // O script original parece garantir data-pre-plain-text para cada bolha, mas vamos prevenir
     return {
         time: '',
         date: '',
         author: '',
-        text: rawText
+        text: raw.conteudo && raw.conteudo.texto ? raw.conteudo.texto : '',
+        images: raw.conteudo && raw.conteudo.imagens ? raw.conteudo.imagens : []
     };
 }
 

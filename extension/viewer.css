@@ -391,3 +391,62 @@ body {
 .secondary-btn:hover {
     background-color: rgba(0, 128, 105, 0.05);
 }
+
+/* Imagens nas mensagens */
+.msg-images {
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.msg-images img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.msg-images img:hover {
+    opacity: 0.9;
+}
+
+/* Modal de Imagem Fullscreen */
+.image-modal-overlay {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.image-modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 5px;
+    object-fit: contain;
+    animation: zoom 0.3s;
+}
+
+.close-image {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close-image:hover,
+.close-image:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
