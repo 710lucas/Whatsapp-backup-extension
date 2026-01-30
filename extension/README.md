@@ -12,7 +12,7 @@ Esta extensão extrai conversas do WhatsApp Web e gera um JSON, além de possuir
 
 ## Como instalar
 
-Primeiramente, baixe a versão mais recente na aba **[Releases](../../releases)** deste repositório e extraia o arquivo `.zip`.
+Primeiramente, baixe a versão mais recente na aba **[Releases](https://github.com/710lucas/Whatsapp-backup-extension/releases)** deste repositório e extraia o arquivo `.zip`.
 
 ### Chrome / Edge / Brave / Opera
 
