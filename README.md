@@ -1,3 +1,4 @@
+
 # WhatsApp Backup & Viewer Extension
 
 Esta extensão extrai conversas do WhatsApp Web e gera um JSON, além de possuir um visualizador integrado para ler os backups com uma interface similar ao WhatsApp.
@@ -12,12 +13,14 @@ Esta extensão extrai conversas do WhatsApp Web e gera um JSON, além de possuir
 
 ## Como instalar
 
+Primeiramente, baixe a versão mais recente na aba **[Releases](https://github.com/710lucas/Whatsapp-backup-extension/releases)** deste repositório e extraia o arquivo `.zip`.
+
 ### Chrome / Edge / Brave / Opera
 
 1.  Acesse `chrome://extensions/`.
 2.  Ative o **Modo do desenvolvedor** (Developer mode).
 3.  Clique em **Carregar sem compactação** (Load unpacked).
-4.  Selecione a pasta `extension` deste projeto.
+4.  Selecione a pasta onde você extraiu os arquivos.
 5.  O ícone aparecerá na barra de ferramentas.
 
 ### Firefox
@@ -25,7 +28,7 @@ Esta extensão extrai conversas do WhatsApp Web e gera um JSON, além de possuir
 1.  Acesse `about:debugging`.
 2.  Menu lateral: "Este Firefox".
 3.  Clique em **Carregar extensão temporária**.
-4.  Selecione o arquivo `extension/manifest.json`.
+4.  Selecione o arquivo `manifest.json` dentro da pasta extraída.
 
 ## Como usar
 
