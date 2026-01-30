@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Backup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>WhatsApp Backup</h2>
+    <p>Insira o número máximo de conversas para processar:</p>
+    
+    <div class="input-group">
+      <input type="number" id="maxConversas" value="5" min="1">
+      <button id="btnRun">Iniciar Backup</button>
+    </div>
+
+    <!-- Novo Botão -->
+    <button id="btnViewer" class="secondary-btn">Abrir Visualizador de Backup</button>
+
+    <div id="status" class="hidden">Processando...</div>
+
+    <div id="resultArea" class="hidden">
+      <div class="actions">
+        <span>Resultado (JSON):</span>
+        <button id="btnCopy">Copiar JSON</button>
+      </div>
+      <textarea id="jsonOutput" readonly></textarea>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

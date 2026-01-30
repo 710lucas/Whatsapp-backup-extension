@@ -1,0 +1,105 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  width: 350px;
+  padding: 15px;
+  background-color: #f0f2f5;
+  color: #111b21;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+h2 {
+  margin: 0;
+  color: #008069;
+}
+
+p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+}
+
+input[type="number"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 60px;
+}
+
+button {
+  background-color: #008069;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  flex-grow: 1;
+}
+
+button:hover {
+  background-color: #006d59;
+}
+
+.secondary-btn {
+  background-color: #f0f2f5;
+  color: #111b21;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.secondary-btn:hover {
+  background-color: #d9dbde;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.hidden {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#btnCopy {
+  width: auto;
+  padding: 4px 8px;
+  font-size: 11px;
+  background-color: #00a884;
+}
+
+#status {
+  padding: 10px;
+  background-color: #e9edef;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 13px;
+}
